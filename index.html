@@ -78,7 +78,16 @@
         <h2>My Profile</h2>
         <form id="profile-form" class="card">
           <div class="profile-header">
-            <img id="profile-avatar" class="profile-avatar" src="" alt="Profile Avatar">
+            <div class="avatar-upload">
+              <img id="profile-avatar" class="profile-avatar" src="" alt="Profile Avatar">
+              <div class="avatar-overlay">
+                <label for="avatar-input" class="avatar-upload-btn">
+                  <span>📷</span>
+                  <span>Upload</span>
+                </label>
+                <input type="file" id="avatar-input" accept="image/*" hidden>
+              </div>
+            </div>
             <div class="profile-info">
               <label>Display Name
                 <input id="profile-display-name" type="text">
@@ -86,9 +95,12 @@
               <label>Bio
                 <textarea id="profile-bio" rows="3" placeholder="Tell us about yourself..."></textarea>
               </label>
-              <label>Avatar URL
-                <input id="profile-avatar-url" type="url" placeholder="https://example.com/avatar.jpg">
-              </label>
+              <div class="avatar-options">
+                <label>Or use Avatar URL
+                  <input id="profile-avatar-url" type="url" placeholder="https://example.com/avatar.jpg">
+                </label>
+                <button type="button" id="use-url-btn" class="button ghost small">Use URL</button>
+              </div>
             </div>
           </div>
           <div class="row">

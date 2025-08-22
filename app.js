@@ -45,6 +45,8 @@ const els = {
   profileDisplayName: document.getElementById('profile-display-name'),
   profileBio: document.getElementById('profile-bio'),
   profileAvatarUrl: document.getElementById('profile-avatar-url'),
+  avatarInput: document.getElementById('avatar-input'),
+  useUrlBtn: document.getElementById('use-url-btn'),
 };
 
 function setAuthUI() {
@@ -369,6 +371,46 @@ async function loadProfile() {
   els.profileAvatarUrl.value = state.user.avatar || '';
 }
 
+async function uploadAvatar(file) {
+  if (!state.token) {
+    alert('Please login to upload avatar');
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const response = await fetch(`${state.apiBase}/api/upload/avatar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${state.token}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Upload failed');
+    }
+
+    const result = await response.json();
+    
+    // Update the profile avatar preview
+    els.profileAvatar.src = result.avatarUrl;
+    
+    // Update the avatar URL input
+    els.profileAvatarUrl.value = result.avatarUrl;
+    
+    alert('Avatar uploaded successfully!');
+    return result.avatarUrl;
+  } catch (error) {
+    console.error('Upload error:', error);
+    alert(`Upload failed: ${error.message}`);
+    return null;
+  }
+}
+
 async function updateProfile(e) {
   e.preventDefault();
   
@@ -421,6 +463,35 @@ function init() {
   els.postForm.addEventListener('submit', savePost);
   els.profileForm.addEventListener('submit', updateProfile);
   els.cancelEdit.addEventListener('click', () => resetEditor());
+
+  // Avatar upload functionality
+  els.avatarInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File too large. Maximum size is 5MB.');
+        return;
+      }
+      
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Only image files are allowed (JPEG, PNG, GIF, WebP).');
+        return;
+      }
+      
+      await uploadAvatar(file);
+    }
+  });
+
+  // Use URL button
+  els.useUrlBtn.onclick = () => {
+    const url = els.profileAvatarUrl.value.trim();
+    if (url) {
+      els.profileAvatar.src = url;
+    }
+  };
 
   setAuthUI();
   loadFeed();
