@@ -48,8 +48,16 @@ function setAuthUI() {
 }
 
 function switchTab(name) {
+  // Remove active class from all tabs and panels
+  els.tabs.forEach(tab => tab.classList.remove('active'));
   els.panels.forEach(p => p.classList.remove('is-active'));
-  document.getElementById(`tab-${name}`).classList.add('is-active');
+  
+  // Add active class to selected tab and panel
+  const activeTab = document.querySelector(`[data-tab="${name}"]`);
+  const activePanel = document.getElementById(`tab-${name}`);
+  
+  if (activeTab) activeTab.classList.add('active');
+  if (activePanel) activePanel.classList.add('is-active');
 }
 
 function api(path, opts = {}) {
@@ -205,6 +213,9 @@ function init() {
   setAuthUI();
   loadFeed();
   if (state.token) loadMyPosts();
+  
+  // Set initial active tab
+  switchTab('feed');
 }
 
 document.addEventListener('DOMContentLoaded', init);
