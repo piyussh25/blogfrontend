@@ -102,6 +102,10 @@ function api(path, opts = {}) {
 }
 
 function renderPost(post, { mine = false } = {}) {
+  if (!post || !post.id) {
+    console.warn('Skipping rendering of malformed post:', post);
+    return document.createElement('div'); // Return an empty div or null
+  }
   const node = els.postItemTpl.content.cloneNode(true);
   
   // Set post data
