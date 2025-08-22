@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Piyush Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="#">Piyush Blog</a>
+      <div class="spacer"></div>
+      <div class="auth-cta" id="auth-cta">
+        <button id="show-login" class="button ghost">Login</button>
+        <button id="show-register" class="button">Register</button>
+      </div>
+      <div class="user-menu hidden" id="user-menu">
+        <span id="user-label"></span>
+        <button id="logout" class="button ghost">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <aside class="sidebar">
+      <button class="tab-link" data-tab="feed">All Posts</button>
+      <button class="tab-link" data-tab="my-posts">My Posts</button>
+      <button class="tab-link" data-tab="editor">Write</button>
+      <details class="config">
+        <summary>Config</summary>
+        <label>
+          API Base URL
+          <input id="api-base-input" placeholder="https://your-backend.onrender.com">
+        </label>
+        <button id="save-api-base" class="button small">Save</button>
+      </details>
+    </aside>
+
+    <section class="content">
+      <section id="tab-feed" class="tab is-active">
+        <h2>Latest Posts</h2>
+        <div id="feed-list" class="posts"></div>
+      </section>
+
+      <section id="tab-my-posts" class="tab">
+        <h2>My Posts</h2>
+        <div id="my-posts-list" class="posts"></div>
+      </section>
+
+      <section id="tab-editor" class="tab">
+        <h2 id="editor-title">Write a Post</h2>
+        <form id="post-form" class="card">
+          <input type="hidden" id="post-id">
+          <label>Title
+            <input id="post-title" required>
+          </label>
+          <label>Content
+            <textarea id="post-content" rows="8" required></textarea>
+          </label>
+          <div class="row">
+            <button type="submit" class="button" id="save-post">Publish</button>
+            <button type="button" class="button ghost" id="cancel-edit" hidden>Cancel</button>
+          </div>
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="auth-dialog">
+    <form method="dialog" id="auth-form" class="card auth">
+      <h3 id="auth-mode-label">Login</h3>
+      <div id="auth-username-wrap">
+        <label>Username
+          <input id="auth-username" autocomplete="username">
+        </label>
+      </div>
+      <div id="auth-email-wrap" hidden>
+        <label>Email
+          <input id="auth-email" type="email" autocomplete="email">
+        </label>
+      </div>
+      <label>Password
+        <input id="auth-password" type="password" autocomplete="current-password">
+      </label>
+      <menu>
+        <button value="cancel" class="button ghost">Cancel</button>
+        <button id="auth-submit" value="default" class="button">Continue</button>
+      </menu>
+      <p class="error" id="auth-error" hidden></p>
+    </form>
+  </dialog>
+
+  <template id="post-item-template">
+    <article class="post card">
+      <header class="post-head">
+        <h3 class="post-title"></h3>
+        <div class="post-meta"></div>
+      </header>
+      <div class="post-content"></div>
+      <footer class="post-actions"></footer>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+<!-- Deployed frontend can be hosted on Vercel. Configure API base URL in the sidebar. -->
+</html>
+
+
