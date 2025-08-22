@@ -225,6 +225,12 @@ function toggleComments(commentsSection) {
     return;
   }
   
+  // Add this check
+  if (!commentsSection) {
+    console.error('Comments section element not found.');
+    return;
+  }
+
   const isVisible = commentsSection.style.display !== 'none';
   commentsSection.style.display = isVisible ? 'none' : 'block';
 }
