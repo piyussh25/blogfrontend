@@ -106,7 +106,9 @@ function renderPost(post, { mine = false } = {}) {
     console.warn('Skipping rendering of malformed post:', post);
     return document.createElement('div'); // Return an empty div or null
   }
+  console.log('els.postItemTpl:', els.postItemTpl);
   const node = els.postItemTpl.content.cloneNode(true);
+  console.log('Cloned node:', node);
   
   // Set post data
   node.querySelector('.post-title').textContent = post.title;
@@ -135,6 +137,7 @@ function renderPost(post, { mine = false } = {}) {
   
   // Set comment button
   const commentButton = node.querySelector('.comment-button');
+  console.log('Comment button:', commentButton);
   const commentCount = commentButton.querySelector('.comment-count');
   commentCount.textContent = post.commentCount || 0;
   
@@ -146,6 +149,7 @@ function renderPost(post, { mine = false } = {}) {
   
   // Render comments
   const commentsList = node.querySelector('.comments-list');
+  console.log('Comments section found:', commentsList);
   commentsList.innerHTML = '';
   
   if (post.comments && post.comments.length > 0) {
