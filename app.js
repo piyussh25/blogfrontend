@@ -377,6 +377,9 @@ async function uploadAvatar(file) {
     return;
   }
 
+  console.log('Uploading avatar with token:', state.token.substring(0, 20) + '...');
+  console.log('User state:', state.user);
+
   try {
     const formData = new FormData();
     formData.append('avatar', file);
@@ -389,12 +392,17 @@ async function uploadAvatar(file) {
       body: formData
     });
 
+    console.log('Upload response status:', response.status);
+    console.log('Upload response headers:', response.headers);
+
     if (!response.ok) {
       const error = await response.json();
+      console.error('Upload error response:', error);
       throw new Error(error.error || 'Upload failed');
     }
 
     const result = await response.json();
+    console.log('Upload success result:', result);
     
     // Update the profile avatar preview
     els.profileAvatar.src = result.avatarUrl;
