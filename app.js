@@ -112,7 +112,9 @@ function renderPost(post, { mine = false } = {}) {
   
   // Set post data
   node.querySelector('.post-title').textContent = post.title;
-  node.querySelector('.post-meta').textContent = `by ${post.author ? (post.author.displayName || post.author.username) : 'Unknown User'} • ${new Date(post.createdAt).toLocaleString()}`;
+  const postMeta = node.querySelector('.post-meta');
+  const authorName = post.author ? (post.author.displayName || post.author.username) : 'Unknown User';
+  postMeta.innerHTML = `by ${authorName} ${post.author && post.author.role === 'admin' ? '<img src="https://static.vecteezy.com/system/resources/previews/015/304/837/large_2x/blue-verified-tick-valid-seal-icon-in-flat-style-design-isolated-on-white-background/validation-concept-vector.jpg" class="verified-icon" alt="Verified Admin">': ''} • ${new Date(post.createdAt).toLocaleString()}`;
   node.querySelector('.post-content').textContent = post.content;
   
   // Set author avatar

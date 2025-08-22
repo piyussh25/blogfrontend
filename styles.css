@@ -773,4 +773,11 @@ menu {
   display: block;
 }
 
+.verified-icon {
+  width: 16px; /* Adjust size as needed */
+  height: 16px; /* Adjust size as needed */
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
 
