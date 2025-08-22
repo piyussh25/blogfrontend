@@ -227,8 +227,7 @@ async function toggleLike(postId, button) {
 }
 
 function toggleComments(button) { // Accept the button element directly
-  const postElement = button.closest('.post'); // Find the parent post element
-  const commentsSection = postElement.querySelector('.comments-section'); // Find comments section within that post
+  const commentsSection = button.closest('.post').querySelector('.comments-section'); // Find comments section relative to the button
 
   if (!state.token) {
     alert('Please login to comment');
