@@ -268,6 +268,7 @@ async function addComment(postId, content, commentsList) {
 
 async function loadFeed() {
   const posts = await api('/api/posts');
+  console.log('Posts received from API:', posts); // Add this line
   els.feedList.innerHTML = '';
   posts.forEach(p => els.feedList.appendChild(renderPost(p)));
 }
