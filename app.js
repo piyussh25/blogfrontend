@@ -102,7 +102,7 @@ function api(path, opts = {}) {
 }
 
 function renderPost(post, { mine = false } = {}) {
-  if (!post || !post.id) {
+  if (!post || !post._id) {
     console.warn('Skipping rendering of malformed post:', post);
     return document.createElement('div'); // Return an empty div or null
   }
@@ -122,7 +122,7 @@ function renderPost(post, { mine = false } = {}) {
   
   // Set like button
   const likeButton = node.querySelector('.like-button');
-  likeButton.dataset.postId = post.id;
+  likeButton.dataset.postId = post._id;
   const likeIcon = likeButton.querySelector('.like-icon');
   const likeCount = likeButton.querySelector('.like-count');
   
@@ -142,7 +142,7 @@ function renderPost(post, { mine = false } = {}) {
   commentCount.textContent = post.commentCount || 0;
   
   // Add like functionality
-  likeButton.onclick = () => toggleLike(post.id, likeButton);
+  likeButton.onclick = () => toggleLike(post._id, likeButton);
   
   // Add comment functionality
   commentButton.onclick = () => toggleComments(node.querySelector('.comments-section'));
@@ -175,7 +175,7 @@ function renderPost(post, { mine = false } = {}) {
   commentForm.onsubmit = (e) => {
     e.preventDefault();
     const input = commentForm.querySelector('.comment-input');
-    addComment(post.id, input.value, commentsList);
+    addComment(post._id, input.value, commentsList);
     input.value = '';
   };
   
@@ -190,7 +190,7 @@ function renderPost(post, { mine = false } = {}) {
     const del = document.createElement('button');
     del.className = 'button ghost small';
     del.textContent = 'Delete';
-    del.onclick = () => deletePost(post.id);
+    del.onclick = () => deletePost(post._id);
     
     ownerActions.append(edit, del);
   }
@@ -294,7 +294,7 @@ async function loadMyPosts() {
 
 function beginEdit(post) {
   switchTab('editor');
-  els.postId.value = post.id;
+  els.postId.value = post._id;
   els.postTitle.value = post.title;
   els.postContent.value = post.content;
   els.editorTitle.textContent = 'Edit Post';
