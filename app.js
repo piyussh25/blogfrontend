@@ -106,7 +106,7 @@ function renderPost(post, { mine = false } = {}) {
   
   // Set post data
   node.querySelector('.post-title').textContent = post.title;
-  node.querySelector('.post-meta').textContent = `by ${post.author.displayName || post.author.username} • ${new Date(post.createdAt).toLocaleString()}`;
+  node.querySelector('.post-meta').textContent = `by ${post.author ? (post.author.displayName || post.author.username) : 'Unknown User'} • ${new Date(post.createdAt).toLocaleString()}`;
   node.querySelector('.post-content').textContent = post.content;
   
   // Set author avatar
