@@ -33,6 +33,9 @@ const els = {
   editorTitle: document.getElementById('editor-title'),
   cancelEdit: document.getElementById('cancel-edit'),
   postItemTpl: document.getElementById('post-item-template'),
+  mobileNavToggle: document.getElementById('mobile-nav-toggle'),
+  sidebar: document.getElementById('sidebar'),
+  sidebarOverlay: document.getElementById('sidebar-overlay'),
 };
 
 function setAuthUI() {
@@ -58,6 +61,21 @@ function switchTab(name) {
   
   if (activeTab) activeTab.classList.add('active');
   if (activePanel) activePanel.classList.add('is-active');
+  
+  // Close mobile sidebar after tab switch
+  closeMobileSidebar();
+}
+
+function openMobileSidebar() {
+  els.sidebar.classList.add('open');
+  els.sidebarOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileSidebar() {
+  els.sidebar.classList.remove('open');
+  els.sidebarOverlay.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function api(path, opts = {}) {
@@ -202,6 +220,10 @@ function init() {
   els.tabs.forEach(btn => {
     btn.onclick = () => switchTab(btn.dataset.tab);
   });
+
+  // Mobile navigation
+  els.mobileNavToggle.onclick = openMobileSidebar;
+  els.sidebarOverlay.onclick = closeMobileSidebar;
 
   els.showLogin.onclick = () => openAuth('login');
   els.showRegister.onclick = () => openAuth('register');
