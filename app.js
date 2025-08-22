@@ -223,7 +223,11 @@ async function toggleLike(postId, button) {
   }
 }
 
-function toggleComments(commentsSection) {
+function toggleComments(event) { // Accept the event object
+  const button = event.currentTarget; // The clicked button
+  const postElement = button.closest('.post'); // Find the parent post element
+  const commentsSection = postElement.querySelector('.comments-section'); // Find comments section within that post
+
   if (!state.token) {
     alert('Please login to comment');
     return;
