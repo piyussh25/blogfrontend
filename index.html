@@ -20,7 +20,11 @@
         <button id="show-register" class="button">Register</button>
       </div>
       <div class="user-menu hidden" id="user-menu">
-        <span id="user-label"></span>
+        <div class="user-info">
+          <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
+          <span id="user-label"></span>
+        </div>
+        <button id="show-profile" class="button ghost small">Profile</button>
         <button id="logout" class="button ghost">Logout</button>
       </div>
     </nav>
@@ -31,6 +35,7 @@
       <button class="tab-link" data-tab="feed">All Posts</button>
       <button class="tab-link" data-tab="my-posts">My Posts</button>
       <button class="tab-link" data-tab="editor">Write</button>
+      <button class="tab-link" data-tab="profile">Profile</button>
       <details class="config">
         <summary>Config</summary>
         <label>
@@ -68,6 +73,29 @@
           </div>
         </form>
       </section>
+
+      <section id="tab-profile" class="tab">
+        <h2>My Profile</h2>
+        <form id="profile-form" class="card">
+          <div class="profile-header">
+            <img id="profile-avatar" class="profile-avatar" src="" alt="Profile Avatar">
+            <div class="profile-info">
+              <label>Display Name
+                <input id="profile-display-name" type="text">
+              </label>
+              <label>Bio
+                <textarea id="profile-bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+              </label>
+              <label>Avatar URL
+                <input id="profile-avatar-url" type="url" placeholder="https://example.com/avatar.jpg">
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <button type="submit" class="button">Update Profile</button>
+          </div>
+        </form>
+      </section>
     </section>
   </main>
 
@@ -87,6 +115,11 @@
           <input id="auth-email" type="email" autocomplete="email">
         </label>
       </div>
+      <div id="auth-display-name-wrap" hidden>
+        <label>Display Name
+          <input id="auth-display-name" type="text" placeholder="Optional">
+        </label>
+      </div>
       <label>Password
         <input id="auth-password" type="password" autocomplete="current-password">
       </label>
@@ -101,11 +134,33 @@
   <template id="post-item-template">
     <article class="post card">
       <header class="post-head">
-        <h3 class="post-title"></h3>
-        <div class="post-meta"></div>
+        <div class="post-author">
+          <img class="author-avatar" src="" alt="Author Avatar">
+          <div class="author-info">
+            <h3 class="post-title"></h3>
+            <div class="post-meta"></div>
+          </div>
+        </div>
       </header>
       <div class="post-content"></div>
-      <footer class="post-actions"></footer>
+      <div class="post-actions">
+        <button class="like-button" data-post-id="">
+          <span class="like-icon">🤍</span>
+          <span class="like-count">0</span>
+        </button>
+        <button class="comment-button">
+          <span class="comment-icon">💬</span>
+          <span class="comment-count">0</span>
+        </button>
+        <div class="post-owner-actions"></div>
+      </div>
+      <div class="comments-section" style="display: none;">
+        <div class="comments-list"></div>
+        <form class="comment-form">
+          <input type="text" class="comment-input" placeholder="Write a comment..." required>
+          <button type="submit" class="button small">Comment</button>
+        </form>
+      </div>
     </article>
   </template>
 

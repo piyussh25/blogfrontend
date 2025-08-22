@@ -13,8 +13,10 @@ const els = {
   authCta: document.getElementById('auth-cta'),
   userMenu: document.getElementById('user-menu'),
   userLabel: document.getElementById('user-label'),
+  userAvatar: document.getElementById('user-avatar'),
   showLogin: document.getElementById('show-login'),
   showRegister: document.getElementById('show-register'),
+  showProfile: document.getElementById('show-profile'),
   logout: document.getElementById('logout'),
   dialog: document.getElementById('auth-dialog'),
   authForm: document.getElementById('auth-form'),
@@ -22,6 +24,8 @@ const els = {
   authUsername: document.getElementById('auth-username'),
   authEmailWrap: document.getElementById('auth-email-wrap'),
   authEmail: document.getElementById('auth-email'),
+  authDisplayNameWrap: document.getElementById('auth-display-name-wrap'),
+  authDisplayName: document.getElementById('auth-display-name'),
   authPassword: document.getElementById('auth-password'),
   authError: document.getElementById('auth-error'),
   apiBaseInput: document.getElementById('api-base-input'),
@@ -36,17 +40,24 @@ const els = {
   mobileNavToggle: document.getElementById('mobile-nav-toggle'),
   sidebar: document.getElementById('sidebar'),
   sidebarOverlay: document.getElementById('sidebar-overlay'),
+  profileForm: document.getElementById('profile-form'),
+  profileAvatar: document.getElementById('profile-avatar'),
+  profileDisplayName: document.getElementById('profile-display-name'),
+  profileBio: document.getElementById('profile-bio'),
+  profileAvatarUrl: document.getElementById('profile-avatar-url'),
 };
 
 function setAuthUI() {
   if (state.token && state.user) {
     els.authCta.classList.add('hidden');
     els.userMenu.classList.remove('hidden');
-    els.userLabel.textContent = state.user.username;
+    els.userLabel.textContent = state.user.displayName || state.user.username;
+    els.userAvatar.src = state.user.avatar;
   } else {
     els.authCta.classList.remove('hidden');
     els.userMenu.classList.add('hidden');
     els.userLabel.textContent = '';
+    els.userAvatar.src = '';
   }
 }
 
@@ -90,22 +101,163 @@ function api(path, opts = {}) {
 
 function renderPost(post, { mine = false } = {}) {
   const node = els.postItemTpl.content.cloneNode(true);
+  
+  // Set post data
   node.querySelector('.post-title').textContent = post.title;
-  node.querySelector('.post-meta').textContent = `by ${post.authorUsername} • ${new Date(post.createdAt).toLocaleString()}`;
+  node.querySelector('.post-meta').textContent = `by ${post.author.displayName || post.author.username} • ${new Date(post.createdAt).toLocaleString()}`;
   node.querySelector('.post-content').textContent = post.content;
-  const actions = node.querySelector('.post-actions');
+  
+  // Set author avatar
+  const authorAvatar = node.querySelector('.author-avatar');
+  authorAvatar.src = post.author.avatar;
+  authorAvatar.alt = `${post.author.displayName || post.author.username}'s avatar`;
+  
+  // Set like button
+  const likeButton = node.querySelector('.like-button');
+  likeButton.dataset.postId = post.id;
+  const likeIcon = likeButton.querySelector('.like-icon');
+  const likeCount = likeButton.querySelector('.like-count');
+  
+  likeCount.textContent = post.likeCount || 0;
+  if (post.isLiked) {
+    likeButton.classList.add('liked');
+    likeIcon.textContent = '❤️';
+  } else {
+    likeButton.classList.remove('liked');
+    likeIcon.textContent = '🤍';
+  }
+  
+  // Set comment button
+  const commentButton = node.querySelector('.comment-button');
+  const commentCount = commentButton.querySelector('.comment-count');
+  commentCount.textContent = post.commentCount || 0;
+  
+  // Add like functionality
+  likeButton.onclick = () => toggleLike(post.id, likeButton);
+  
+  // Add comment functionality
+  commentButton.onclick = () => toggleComments(node.querySelector('.comments-section'));
+  
+  // Render comments
+  const commentsList = node.querySelector('.comments-list');
+  commentsList.innerHTML = '';
+  
+  if (post.comments && post.comments.length > 0) {
+    post.comments.forEach(comment => {
+      const commentEl = document.createElement('div');
+      commentEl.className = 'comment';
+      commentEl.innerHTML = `
+        <img class="comment-avatar" src="${comment.author.avatar}" alt="${comment.author.displayName || comment.author.username}'s avatar">
+        <div class="comment-content">
+          <div class="comment-header">
+            <span class="comment-author">${comment.author.displayName || comment.author.username}</span>
+            <span class="comment-time">${new Date(comment.createdAt).toLocaleString()}</span>
+          </div>
+          <div class="comment-text">${comment.content}</div>
+        </div>
+      `;
+      commentsList.appendChild(commentEl);
+    });
+  }
+  
+  // Add comment form functionality
+  const commentForm = node.querySelector('.comment-form');
+  commentForm.onsubmit = (e) => {
+    e.preventDefault();
+    const input = commentForm.querySelector('.comment-input');
+    addComment(post.id, input.value, commentsList);
+    input.value = '';
+  };
+  
+  // Add owner actions if it's the user's post
+  const ownerActions = node.querySelector('.post-owner-actions');
   if (mine) {
     const edit = document.createElement('button');
-    edit.className = 'button ghost';
+    edit.className = 'button ghost small';
     edit.textContent = 'Edit';
     edit.onclick = () => beginEdit(post);
+    
     const del = document.createElement('button');
-    del.className = 'button ghost';
+    del.className = 'button ghost small';
     del.textContent = 'Delete';
     del.onclick = () => deletePost(post.id);
-    actions.append(edit, del);
+    
+    ownerActions.append(edit, del);
   }
+  
   return node;
+}
+
+async function toggleLike(postId, button) {
+  if (!state.token) {
+    alert('Please login to like posts');
+    return;
+  }
+  
+  try {
+    const response = await api(`/api/posts/${postId}/like`, { method: 'POST' });
+    const likeIcon = button.querySelector('.like-icon');
+    const likeCount = button.querySelector('.like-count');
+    
+    likeCount.textContent = response.likeCount;
+    if (response.isLiked) {
+      button.classList.add('liked');
+      likeIcon.textContent = '❤️';
+    } else {
+      button.classList.remove('liked');
+      likeIcon.textContent = '🤍';
+    }
+  } catch (error) {
+    console.error('Like error:', error);
+    alert('Failed to like post');
+  }
+}
+
+function toggleComments(commentsSection) {
+  if (!state.token) {
+    alert('Please login to comment');
+    return;
+  }
+  
+  const isVisible = commentsSection.style.display !== 'none';
+  commentsSection.style.display = isVisible ? 'none' : 'block';
+}
+
+async function addComment(postId, content, commentsList) {
+  if (!state.token) {
+    alert('Please login to comment');
+    return;
+  }
+  
+  try {
+    const comment = await api(`/api/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content })
+    });
+    
+    // Add the new comment to the list
+    const commentEl = document.createElement('div');
+    commentEl.className = 'comment';
+    commentEl.innerHTML = `
+      <img class="comment-avatar" src="${state.user.avatar}" alt="${state.user.displayName || state.user.username}'s avatar">
+      <div class="comment-content">
+        <div class="comment-header">
+          <span class="comment-author">${state.user.displayName || state.user.username}</span>
+          <span class="comment-time">Just now</span>
+        </div>
+        <div class="comment-text">${content}</div>
+      </div>
+    `;
+    commentsList.appendChild(commentEl);
+    
+    // Update comment count
+    const commentButton = commentsList.closest('.post').querySelector('.comment-button');
+    const commentCount = commentButton.querySelector('.comment-count');
+    commentCount.textContent = parseInt(commentCount.textContent) + 1;
+  } catch (error) {
+    console.error('Comment error:', error);
+    alert('Failed to add comment');
+  }
 }
 
 async function loadFeed() {
@@ -161,6 +313,7 @@ async function deletePost(id) {
 function openAuth(mode) {
   els.authModeLabel.textContent = mode === 'register' ? 'Register' : 'Login';
   els.authEmailWrap.hidden = mode !== 'register';
+  els.authDisplayNameWrap.hidden = mode !== 'register';
   els.dialog.showModal();
   els.dialog.dataset.mode = mode;
 }
@@ -177,6 +330,7 @@ async function submitAuth(e) {
           username: els.authUsername.value.trim(),
           email: els.authEmail.value.trim(),
           password: els.authPassword.value,
+          displayName: els.authDisplayName.value.trim() || undefined,
         }),
       });
       // fallthrough to login
@@ -206,6 +360,40 @@ function logout() {
   setAuthUI();
 }
 
+async function loadProfile() {
+  if (!state.user) return;
+  
+  els.profileAvatar.src = state.user.avatar;
+  els.profileDisplayName.value = state.user.displayName || '';
+  els.profileBio.value = state.user.bio || '';
+  els.profileAvatarUrl.value = state.user.avatar || '';
+}
+
+async function updateProfile(e) {
+  e.preventDefault();
+  
+  try {
+    const response = await api('/api/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify({
+        displayName: els.profileDisplayName.value.trim(),
+        bio: els.profileBio.value.trim(),
+        avatar: els.profileAvatarUrl.value.trim(),
+      }),
+    });
+    
+    // Update state and UI
+    state.user = response.user;
+    localStorage.setItem('user', JSON.stringify(response.user));
+    setAuthUI();
+    
+    alert('Profile updated successfully!');
+  } catch (error) {
+    console.error('Profile update error:', error);
+    alert('Failed to update profile');
+  }
+}
+
 function init() {
   els.apiBaseInput.value = state.apiBase;
   els.saveApiBase.onclick = () => {
@@ -227,14 +415,19 @@ function init() {
 
   els.showLogin.onclick = () => openAuth('login');
   els.showRegister.onclick = () => openAuth('register');
+  els.showProfile.onclick = () => switchTab('profile');
   els.logout.onclick = logout;
   els.authForm.addEventListener('submit', submitAuth);
   els.postForm.addEventListener('submit', savePost);
+  els.profileForm.addEventListener('submit', updateProfile);
   els.cancelEdit.addEventListener('click', () => resetEditor());
 
   setAuthUI();
   loadFeed();
-  if (state.token) loadMyPosts();
+  if (state.token) {
+    loadMyPosts();
+    loadProfile();
+  }
   
   // Set initial active tab
   switchTab('feed');
