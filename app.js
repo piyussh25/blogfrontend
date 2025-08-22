@@ -111,8 +111,8 @@ function renderPost(post, { mine = false } = {}) {
   
   // Set author avatar
   const authorAvatar = node.querySelector('.author-avatar');
-  authorAvatar.src = post.author.avatar;
-  authorAvatar.alt = `${post.author.displayName || post.author.username}'s avatar`;
+  authorAvatar.src = post.author ? post.author.avatar : ''; // Provide a default empty string or a placeholder image URL
+  authorAvatar.alt = `${post.author ? (post.author.displayName || post.author.username) : 'Unknown User'}'s avatar`;
   
   // Set like button
   const likeButton = node.querySelector('.like-button');
