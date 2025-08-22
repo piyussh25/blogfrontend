@@ -1,6 +1,6 @@
 // Minimal SPA logic for auth and posts
 const state = {
-  apiBase: localStorage.getItem('api-base') || 'http://localhost:8080',
+  apiBase: localStorage.getItem('api-base') || 'https://blogbackend-6l7p.onrender.com',
   token: localStorage.getItem('token') || null,
   user: JSON.parse(localStorage.getItem('user') || 'null'),
 };
