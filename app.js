@@ -181,7 +181,8 @@ function renderPost(post, { mine = false } = {}) {
   
   // Add owner actions if it's the user's post
   const ownerActions = node.querySelector('.post-owner-actions');
-  if (mine) {
+  // Add owner actions if it's the user's post OR the user is an admin
+  if (mine || (state.user && state.user.role === 'admin')) {
     const edit = document.createElement('button');
     edit.className = 'button ghost small';
     edit.textContent = 'Edit';
